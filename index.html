@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Newton Cradle Pro</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #0b0d12;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+    }
+    canvas { display: block; }
+    .panel {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 340px;
+      padding: 20px;
+      background: rgba(18, 20, 26, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      backdrop-filter: blur(16px);
+      z-index: 100;
+      max-height: calc(100vh - 30px);
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+    h2 {
+      margin-top: 0;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 20px;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+    }
+    .group { margin-bottom: 16px; }
+    label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #b3b9c9;
+    }
+    span { color: #00cec9; font-weight: bold; }
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: #2d3436;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #00cec9;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    select {
+      width: 100%;
+      padding: 8px 12px;
+      background: #2d3436;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      outline: none;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    button {
+      padding: 11px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+    .apply { background: #00b894; color: white; }
+    .apply:hover {
+      background: #00c9a0;
+      box-shadow: 0 4px 12px rgba(0, 184, 148, 0.3);
+    }
+    .reset { background: #0984e3; color: white; }
+    .reset:hover {
+      background: #1da1ff;
+      box-shadow: 0 4px 12px rgba(9, 132, 227, 0.3);
+    }
+    .toggle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .launch-panel {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      width: 280px;
+      padding: 20px;
+      border-radius: 16px;
+      background: rgba(18, 20, 26, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      z-index: 100;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+    .launch-title {
+      text-align: center;
+      font-size: 14px;
+      margin-bottom: 16px;
+      color: #81ecec;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .mode-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .mode-btn { background: #2d3436; color: #b3b9c9; padding: 9px; }
+    .mode-btn.active {
+      background: #00cec9;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0, 206, 201, 0.2);
+    }
+    .separator {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      margin: 20px 0 15px 0;
+      padding-top: 15px;
+    }
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #00cec9;
+      cursor: pointer;
+    }
+    .panel::-webkit-scrollbar { width: 6px; }
+    .panel::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+    @media (max-width: 700px) {
+      .panel { width: calc(100% - 20px); right: 10px; top: 10px; max-height: 50vh; }
+      .launch-panel { width: calc(100% - 20px); left: 10px; top: auto; bottom: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="launch-panel">
+    <div class="launch-title">إعدادات الانطلاق</div>
+    <div class="mode-buttons">
+      <button class="mode-btn active" id="singleSideBtn">جهة واحدة</button>
+      <button class="mode-btn" id="doubleSideBtn">جهتين</button>
+    </div>
+    <div class="group">
+      <label><span id="launchCountValue">1</span>عدد الكرات</label>
+      <input id="launchCountInput" type="range" min="1" max="5" step="1" value="1">
+    </div>
+    <div class="group">
+      <label><span id="launchAngleValue">45</span>زاوية الرفع</label>
+      <input id="launchAngleInput" type="range" min="5" max="80" step="1" value="45">
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Newton Cradle Pro</h2>
+    <div class="group">
+      <label><span id="gravityValue">9.81</span>الجاذبية</label>
+      <input id="gravityInput" type="range" min="1" max="30" step="0.1" value="9.81">
+    </div>
+    <div class="group">
+      <label><span id="restitutionValue">0.995</span>معامل الارتداد</label>
+      <input id="restitutionInput" type="range" min="0.8" max="1" step="0.001" value="0.995">
+    </div>
+    <div class="group">
+      <label><span id="dampingValue">0.9994</span>مقاومة الهواء</label>
+      <input id="dampingInput" type="range" min="0.95" max="1" step="0.0001" value="0.9994">
+    </div>
+
+    <div class="separator">
+      <div style="color: #81ecec; font-size: 13px; font-weight: bold; margin-bottom: 12px; text-align: center;">
+        التحكم المتقدم بالكرات
+      </div>
+      <div class="mode-buttons" style="margin-bottom: 12px;">
+        <button class="mode-btn active" id="allBallsModeBtn" type="button">الكل معاً</button>
+        <button class="mode-btn" id="singleBallModeBtn" type="button">تخصيص كرة</button>
+      </div>
+      <div class="group" id="ballSelectGroup" style="opacity: 0.5; pointer-events: none; transition: opacity 0.2s;">
+        <label>اختر الكرة لتعديلها</label>
+        <select id="ballSelect">
+          <option value="0">الكرة 1 (الأولى من اليسار)</option>
+          <option value="1">الكرة 2</option>
+          <option value="2">الكرة 3 (الوسطى)</option>
+          <option value="3">الكرة 4</option>
+          <option value="4">الكرة 5 (الأخيرة من اليمين)</option>
+        </select>
+      </div>
+      <div class="group">
+        <label><span id="lengthValue">5.0</span>طول الخيط</label>
+        <input id="lengthInput" type="range" min="2" max="6" step="0.1" value="5">
+      </div>
+      <div class="group">
+        <label><span id="massValue">1.0</span>الكتلة</label>
+        <input id="massInput" type="range" min="0.1" max="10" step="0.1" value="1">
+      </div>
+    </div>
+    
+    <div class="group toggle">
+      <label style="margin-bottom: 0;">تفعيل المؤثرات الصوتية</label>
+      <input id="soundToggle" type="checkbox" checked>
+    </div>
+    <div class="buttons">
+      <button class="apply" id="applyBtn">تطبيق التغييرات</button>
+      <button class="reset" id="resetBtn">إعادة ضبط</button>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
