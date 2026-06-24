@@ -88,6 +88,7 @@ pillarPositions.forEach(pos => {
     frame.add(pillar);
 });
 
+// الجسور الأفقية الأساسية
 const beamFront = new THREE.Mesh(beamGeometry, frameMaterial);
 beamFront.position.set(0, PIVOT_Y, 1.4);
 beamFront.castShadow = true;
@@ -96,6 +97,24 @@ frame.add(beamFront);
 const beamBack = beamFront.clone();
 beamBack.position.z = -1.4;
 frame.add(beamBack);
+
+// الجسر الأفقي الأوسط
+const beamCenter = beamFront.clone();
+beamCenter.position.z = 0; 
+frame.add(beamCenter);
+
+// --- التعديل الجديد: إضافة العوارض الرابطة الأفقية لتوصيل الجسر الأوسط بالجسور الجانبية ---
+const connectorGeometry = new THREE.BoxGeometry(0.15, 0.15, 2.8); // يمتد من Z=-1.4 إلى Z=1.4
+
+const leftConnector = new THREE.Mesh(connectorGeometry, frameMaterial);
+leftConnector.position.set(-width / 2, PIVOT_Y, 0); // عند الطرف الأيسر للهيكل
+leftConnector.castShadow = true;
+frame.add(leftConnector);
+
+const rightConnector = leftConnector.clone();
+rightConnector.position.x = width / 2; // عند الطرف الأيمن للهيكل
+frame.add(rightConnector);
+
 
 // --- Instantiating Pendulums ---
 const pendulums = [];

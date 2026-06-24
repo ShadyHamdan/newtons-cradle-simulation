@@ -16,9 +16,11 @@ export const settings = {
     sound: true,
 };
 
+// التعديل الجديد: تم استبدال الكود القديم وإضافة خاصية wireCount هنا
 export const pendingBallsSettings = Array.from({ length: BALL_COUNT }, () => ({
     stringLength: 5.0,
-    mass: 1.0
+    mass: 1.0,
+    wireCount: 2 // القيمة الافتراضية هي خيطين
 }));
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();

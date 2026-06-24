@@ -17,6 +17,9 @@ export function setupUI(pendulums) {
     const lengthValue = document.getElementById('lengthValue');
     const massInput = document.getElementById('massInput');
     const massValue = document.getElementById('massValue');
+    
+    // التعديل الجديد: جلب عنصر اختيار طريقة التعليق من الـ HTML
+    const wireSelect = document.getElementById('wireSelect');
 
     const launchCountInput = document.getElementById('launchCountInput');
     const launchCountValue = document.getElementById('launchCountValue');
@@ -47,6 +50,7 @@ export function setupUI(pendulums) {
         updateSlidersFromSelection();
     });
 
+    // التعديل الجديد: تحديث قيمة القائمة المنسدلة للأسلاك بناءً على الكرة المحددة
     function updateSlidersFromSelection() {
         const selectedIdx = parseInt(ballSelect.value);
         const currentBallSettings = pendingBallsSettings[selectedIdx];
@@ -54,6 +58,7 @@ export function setupUI(pendulums) {
         lengthValue.textContent = currentBallSettings.stringLength.toFixed(1);
         massInput.value = currentBallSettings.mass;
         massValue.textContent = currentBallSettings.mass.toFixed(1);
+        wireSelect.value = currentBallSettings.wireCount; 
     }
 
     gravityInput.addEventListener('input', () => {
@@ -95,6 +100,17 @@ export function setupUI(pendulums) {
         }
     });
 
+    // التعديل الجديد: مستمع الأحداث لتحديث مصفوفة الإعدادات المؤقتة عند تغيير طريقة التعليق
+    wireSelect.addEventListener('change', () => {
+        const val = parseInt(wireSelect.value);
+        if (controlMode === 'all') {
+            pendingBallsSettings.forEach(b => b.wireCount = val);
+        } else {
+            const selectedIdx = parseInt(ballSelect.value);
+            pendingBallsSettings[selectedIdx].wireCount = val;
+        }
+    });
+
     launchCountInput.addEventListener('input', () => {
         settings.launchCount = parseInt(launchCountInput.value);
         launchCountValue.textContent = settings.launchCount;
@@ -122,20 +138,37 @@ export function setupUI(pendulums) {
         settings.sound = soundToggle.checked;
     });
 
+    // هنا تم استبدال دالة التطبيق بالكود الشامل والذكي بالكامل للتحكم بالأسلاك هندسياً وبصرياً
     applyBtn.addEventListener('click', () => {
         pendulums.forEach((p, index) => {
             p.individualLength = pendingBallsSettings[index].stringLength;
             p.individualMass = pendingBallsSettings[index].mass;
             p.ball.position.y = -p.individualLength;
 
-            const leftPositions = p.leftWire.geometry.attributes.position.array;
-            leftPositions[4] = -p.individualLength;
-            p.leftWire.geometry.attributes.position.needsUpdate = true;
+            const wireCount = pendingBallsSettings[index].wireCount;
 
+            // مصفوفات نقاط الأسلاك
+            const leftPositions = p.leftWire.geometry.attributes.position.array;
             const rightPositions = p.rightWire.geometry.attributes.position.array;
+
+            // تحديث إحداثيات Y السفلية للأسلاك لتتطابق مع طول الخيط الجديد (الرقم 4 هو المحور Y السفلي)
+            leftPositions[4] = -p.individualLength;
             rightPositions[4] = -p.individualLength;
+
+            // تعديل المحور Z العلوي للأسلاك بناءً على عدد الخيوط (الرقم 2 هو المحور Z العلوي)
+            if (wireCount === 1) {
+                leftPositions[2] = 0; // نقل الخيط الأيسر ليتصل بالجسر الوسطي
+                p.rightWire.visible = false; // إخفاء الخيط الأيمن تماماً
+            } else {
+                leftPositions[2] = 1.4; // إعادة الخيط الأيسر للجسر الأمامي
+                p.rightWire.visible = true; // إظهار الخيط الأيمن
+            }
+
+            // إعلام Three.js بأن المصفوفات قد تغيرت ليتم رسمها من جديد
+            p.leftWire.geometry.attributes.position.needsUpdate = true;
             p.rightWire.geometry.attributes.position.needsUpdate = true;
         });
+        
         applyLaunchConfiguration(pendulums);
     });
 
