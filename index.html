@@ -1,12 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Newton Cradle Pro</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       overflow: hidden;
@@ -14,7 +17,11 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: white;
     }
-    canvas { display: block; }
+
+    canvas {
+      display: block;
+    }
+
     .panel {
       position: absolute;
       top: 15px;
@@ -30,6 +37,7 @@
       overflow-y: auto;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
+
     h2 {
       margin-top: 0;
       text-align: center;
@@ -38,7 +46,11 @@
       letter-spacing: 0.5px;
       color: #ffffff;
     }
-    .group { margin-bottom: 16px; }
+
+    .group {
+      margin-bottom: 16px;
+    }
+
     label {
       display: flex;
       justify-content: space-between;
@@ -46,7 +58,12 @@
       font-size: 13px;
       color: #b3b9c9;
     }
-    span { color: #00cec9; font-weight: bold; }
+
+    span {
+      color: #00cec9;
+      font-weight: bold;
+    }
+
     input[type="range"] {
       width: 100%;
       height: 6px;
@@ -56,6 +73,7 @@
       -webkit-appearance: none;
       appearance: none;
     }
+
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       width: 14px;
@@ -65,7 +83,11 @@
       cursor: pointer;
       transition: 0.1s;
     }
-    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
     select {
       width: 100%;
       padding: 8px 12px;
@@ -77,12 +99,14 @@
       font-size: 13px;
       cursor: pointer;
     }
+
     .buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       margin-top: 10px;
     }
+
     button {
       padding: 11px;
       border: none;
@@ -92,16 +116,27 @@
       font-weight: bold;
       transition: all 0.2s ease;
     }
-    .apply { background: #00b894; color: white; }
+
+    .apply {
+      background: #00b894;
+      color: white;
+    }
+
     .apply:hover {
       background: #00c9a0;
       box-shadow: 0 4px 12px rgba(0, 184, 148, 0.3);
     }
-    .reset { background: #0984e3; color: white; }
+
+    .reset {
+      background: #0984e3;
+      color: white;
+    }
+
     .reset:hover {
       background: #1da1ff;
       box-shadow: 0 4px 12px rgba(9, 132, 227, 0.3);
     }
+
     .toggle {
       display: flex;
       justify-content: space-between;
@@ -110,6 +145,7 @@
       padding: 10px;
       border-radius: 8px;
     }
+
     .launch-panel {
       position: absolute;
       top: 15px;
@@ -123,6 +159,7 @@
       z-index: 100;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
+
     .launch-title {
       text-align: center;
       font-size: 14px;
@@ -132,40 +169,89 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
+
     .mode-buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin-bottom: 16px;
     }
-    .mode-btn { background: #2d3436; color: #b3b9c9; padding: 9px; }
+
+    .mode-btn {
+      background: #2d3436;
+      color: #b3b9c9;
+      padding: 9px;
+    }
+
     .mode-btn.active {
       background: #00cec9;
       color: white;
       box-shadow: 0 4px 10px rgba(0, 206, 201, 0.2);
     }
+
     .separator {
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       margin: 20px 0 15px 0;
       padding-top: 15px;
     }
+
     input[type="checkbox"] {
       width: 16px;
       height: 16px;
       accent-color: #00cec9;
       cursor: pointer;
     }
-    .panel::-webkit-scrollbar { width: 6px; }
+
+    .panel::-webkit-scrollbar {
+      width: 6px;
+    }
+
     .panel::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 3px;
     }
+
+    .launch-action {
+      width: 100%;
+      padding: 11px;
+      background: #e17055;
+      /* لون مميز ومحفز لعملية الإطلاق */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      margin-top: 5px;
+      transition: all 0.2s ease;
+    }
+
+    .launch-action:hover {
+      background: #ff7675;
+      box-shadow: 0 4px 12px rgba(225, 112, 85, 0.3);
+    }
+
+
+
+
     @media (max-width: 700px) {
-      .panel { width: calc(100% - 20px); right: 10px; top: 10px; max-height: 50vh; }
-      .launch-panel { width: calc(100% - 20px); left: 10px; top: auto; bottom: 10px; }
+      .panel {
+        width: calc(100% - 20px);
+        right: 10px;
+        top: 10px;
+        max-height: 50vh;
+      }
+
+      .launch-panel {
+        width: calc(100% - 20px);
+        left: 10px;
+        top: auto;
+        bottom: 10px;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="launch-panel">
     <div class="launch-title">إعدادات الانطلاق</div>
@@ -181,23 +267,47 @@
       <label><span id="launchAngleValue">45</span>زاوية الرفع</label>
       <input id="launchAngleInput" type="range" min="5" max="80" step="1" value="45">
     </div>
+    <div class="group">
+      <label>زاوية الانحراف نحو Z (بالدرجات):</label>
+      <input type="range" id="launchAngleZInput" min="-90" max="90" value="0">
+      <span id="launchAngleZValue">0°</span>
+    </div>
+    <button class="launch-action" id="launchBtn">إطلاق الكرات </button>
   </div>
 
   <div class="panel">
     <h2>Newton Cradle Pro</h2>
+    <div class="control-group">
+      <label for="planet-select">اختر الكوكب/البيئة:</label>
+      <select id="planet-select" class="ui-select">
+        <option value="earth" selected>الأرض (9.81 m/s²)</option>
+        <option value="moon">القمر (1.62 m/s²)</option>
+        <option value="mars">المريخ (3.71 m/s²)</option>
+        <option value="jupiter">المشتري (24.79 m/s²)</option>
+        <option value="mercury">عطارد (3.70 m/s²)</option>
+        <option value="venus">الزهرة (8.87 m/s²)</option>
+        <option value="saturn">زحل (10.44 m/s²)</option>
+        <option value="uranus">أورانوس (8.69 m/s²)</option>
+        <option value="neptune">نبتون (11.15 m/s²)</option>
+        <option value="custom">مخصص (Custom)</option>
+      </select>
+    </div>
+
+    <p></p>
+
     <div class="group">
       <label><span id="gravityValue">9.81</span>الجاذبية</label>
       <input id="gravityInput" type="range" min="1" max="30" step="0.1" value="9.81">
     </div>
     <div class="group">
-      <label><span id="restitutionValue">0.995</span>معامل الارتداد</label>
-      <input id="restitutionInput" type="range" min="0.8" max="1" step="0.001" value="0.995">
-    </div>
-    <div class="group">
-      <label><span id="dampingValue">0.9994</span>مقاومة الهواء</label>
-      <input id="dampingInput" type="range" min="0.95" max="1" step="0.0001" value="0.9994">
+      <label><span id="dampingValue">0.0006</span>مقاومة الهواء</label>
+      <input id="dampingInput" type="range" min="0" max="0.05" step="0.0001" value="0.0006">
     </div>
 
+    <!-- <div class="group"> -->
+    <!-- <label><span id="restitutionValue">0.995</span>معامل الارتداد</label> -->
+    <!-- <input id="restitutionInput" type="range" min="0.8" max="1" step="0.001" value="0.995"> -->
+    <!-- </div> -->
     <div class="separator">
       <div style="color: #81ecec; font-size: 13px; font-weight: bold; margin-bottom: 12px; text-align: center;">
         التحكم المتقدم بالكرات
@@ -217,6 +327,20 @@
         </select>
       </div>
       <div class="group">
+        <label>مادة الكرة:</label>
+        <select id="materialSelect">
+          <option value="0.98" selected>فولاذ (صدمات مرنة جداً)</option>
+          <option value="0.92">زجاج (ارتداد مرتفع)</option>
+          <option value="0.80">مطاط (امتصاص متوسط للطاقة)</option>
+          <option value="0.50">خشب (خامد - يتوقف بسرعة)</option>
+          <option value="custom">مخصص (تحديد يدوي)</option>
+        </select>
+      </div>
+      <div class="group" id="customRestitutionGroup" style="display: none;">
+        <label><span id="restitutionValue">0.995</span>معامل الارتداد الدقيق</label>
+        <input id="restitutionInput" type="range" min="0.1" max="1" step="0.001" value="0.995">
+      </div>
+      <div class="group">
         <label><span id="lengthValue">5.0</span>طول الخيط</label>
         <input id="lengthInput" type="range" min="2" max="6" step="0.1" value="5">
       </div>
@@ -224,7 +348,8 @@
         <label><span id="massValue">1.0</span>الكتلة</label>
         <input id="massInput" type="range" min="0.1" max="10" step="0.1" value="1">
       </div>
-      
+
+
       <div class="group">
         <label>طريقة التعليق:</label>
         <select id="wireSelect">
@@ -233,7 +358,7 @@
         </select>
       </div>
     </div>
-    
+
     <div class="group toggle">
       <label style="margin-bottom: 0;">تفعيل المؤثرات الصوتية</label>
       <input id="soundToggle" type="checkbox" checked>
@@ -246,6 +371,5 @@
 
   <script type="module" src="/src/main.js"></script>
 </body>
-</html>
 
-```
+</html>

@@ -20,7 +20,8 @@ export const settings = {
 export const pendingBallsSettings = Array.from({ length: BALL_COUNT }, () => ({
     stringLength: 5.0,
     mass: 1.0,
-    wireCount: 2 // القيمة الافتراضية هي خيطين
+    wireCount: 2, // القيمة الافتراضية هي خيطين
+    restitution: 0.98
 }));
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -130,4 +131,32 @@ export function solveCollisions(pendulums) {
             }
         }
     }
+}
+
+export function resetPhysicsSimulation(pendulums) {
+    if (!pendulums || !Array.isArray(pendulums)) return;
+
+    pendulums.forEach((pendulum) => {
+        // 1. تصفير السرعة الزاوية والتسارع الزاوي (Angular State)
+        pendulum.angularVelocity = 0;
+        pendulum.angularAcceleration = 0;
+
+        // 2. تصفير السرعات والتسارعات الخطية ثلاثية الأبعاد (Linear State) إن وجدت
+        if (pendulum.velocity) pendulum.velocity.set(0, 0, 0);
+        if (pendulum.acceleration) pendulum.acceleration.set(0, 0, 0);
+
+        // 3. إعادة زاوية التأرجح إلى الصفر (الوضع العمودي تماماً)
+        pendulum.angle = 0;
+
+        // 4. تحديث المصفوفة البصرية (Three.js Mesh) بشكل فوري لإجبار المتصفح على رسمها في وضع السكون
+        // إذا كان كائن البندول لديك يحتوي على دالة تحديث داخلية تقوم بحساب الموضع بناءً على الزاوية:
+        if (typeof pendulum.update === 'function') {
+            pendulum.update(0); // تمرير زمن delta = 0 للتحديث الموضعي فقط
+        } else {
+            // إذا كنت تحسب المواقع يدوياً خارج الكائن، بمجرد تصفير الـ angle، 
+            // سيتولى حبل التحديث (Loop) في الإطار القادم (Next Frame) إعادة الكرات لمكانها تلقائياً.
+        }
+    });
+
+    console.log("🔄 تم تصفير المحرك الفيزيائي وإعادة الكرات إلى وضع السكون العمودي.");
 }

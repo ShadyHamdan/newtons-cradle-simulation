@@ -37,10 +37,19 @@ controls.target.set(0, 2, 0);
 // --- Lighting ---
 scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
-keyLight.position.set(10, 16, 10);
+keyLight.position.set(6, 10, 5);
 keyLight.castShadow = true;
 keyLight.shadow.mapSize.width = 2048;
 keyLight.shadow.mapSize.height = 2048;
+keyLight.shadow.bias = -0.0002;
+keyLight.shadow.normalBias = 0.04;
+keyLight.shadow.camera.left = -15;
+keyLight.shadow.camera.right = 15;
+keyLight.shadow.camera.top = 15;
+keyLight.shadow.camera.bottom = -15;
+
+keyLight.shadow.camera.near = 0.5;
+keyLight.shadow.camera.far = 40;
 scene.add(keyLight);
 
 const rimLight = new THREE.DirectionalLight(0x4488ff, 0.5);
@@ -66,8 +75,17 @@ const chromeMaterial = new THREE.MeshPhysicalMaterial({
     clearcoat: 1, clearcoatRoughness: 0.02, envMapIntensity: 1.5
 });
 const frameMaterial = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.85, roughness: 0.2 });
-const wireMaterial = new THREE.LineBasicMaterial({ color: 0xaaaaaa });
 
+// --- تعديل الخيوط: تحويل المادة إلى MeshStandardMaterial وتوليد أسطوانة نحيفة ---
+const wireMaterial = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.6, metalness: 0.1 });
+const wireGeometry = new THREE.CylinderGeometry(0.012, 0.012, 1, 8);
+wireGeometry.translate(0, -0.5, 0); // نقل مركز الأسطوانة لأعلاها لتسهيل التمديد
+
+// حسابات الأبعاد والزوايا الابتدائية للخيوط (طول 5.0 وعرض الجسر 1.4)
+const defaultLength = 5.0;
+const zOffset = 1.4;
+const initialActualLength = Math.sqrt(defaultLength * defaultLength + zOffset * zOffset);
+const initialWireAngle = Math.atan2(zOffset, defaultLength);
 // --- Support Frame ---
 const frame = new THREE.Group();
 scene.add(frame);
@@ -120,27 +138,36 @@ frame.add(rightConnector);
 const pendulums = [];
 const startX = -((BALL_COUNT - 1) * DIAMETER) / 2;
 
+const ballGeometry = new THREE.SphereGeometry(
+    BALL_RADIUS,
+    64,
+    64
+);
 for (let i = 0; i < BALL_COUNT; i++) {
     const pivotX = startX + i * DIAMETER;
     const group = new THREE.Group();
     group.position.set(pivotX, PIVOT_Y, 0);
     scene.add(group);
 
-    const leftWireGeometry = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, 0, 1.4),
-        new THREE.Vector3(0, -5.0, 0)
-    ]);
-    const rightWireGeometry = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, 0, -1.4),
-        new THREE.Vector3(0, -5.0, 0)
-    ]);
+ const leftWire = new THREE.Mesh(wireGeometry, wireMaterial);
+    const rightWire = new THREE.Mesh(wireGeometry, wireMaterial);
+    
+    leftWire.castShadow = true;
+    rightWire.castShadow = true;
 
-    const leftWire = new THREE.Line(leftWireGeometry, wireMaterial);
-    const rightWire = new THREE.Line(rightWireGeometry, wireMaterial);
+    // ضبط مكان وزاوية الخيط الأيسر الابتدائي
+    leftWire.position.set(0, 0, zOffset);
+    leftWire.rotation.x = initialWireAngle;
+    leftWire.scale.y = initialActualLength;
+
+    // ضبط مكان وزاوية الخيط الأيمن الابتدائي
+    rightWire.position.set(0, 0, -zOffset);
+    rightWire.rotation.x = -initialWireAngle;
+    rightWire.scale.y = initialActualLength;
+
     group.add(leftWire);
     group.add(rightWire);
 
-    const ballGeometry = new THREE.SphereGeometry(BALL_RADIUS, 64, 64);
     const ball = new THREE.Mesh(ballGeometry, chromeMaterial);
     ball.position.y = -5.0;
     ball.castShadow = true;
@@ -159,7 +186,8 @@ for (let i = 0; i < BALL_COUNT; i++) {
 }
 
 // --- Initialize Engine ---
-applyLaunchConfiguration(pendulums);
+
+// applyLaunchConfiguration(pendulums);
 setupUI(pendulums);
 
 // --- Animation Loop ---
@@ -188,6 +216,11 @@ function animate() {
 }
 
 animate();
+
+
+
+
+
 
 // --- Window Resize ---
 window.addEventListener('resize', () => {
