@@ -253,27 +253,33 @@
 </head>
 
 <body>
-  <div class="launch-panel">
-    <div class="launch-title">إعدادات الانطلاق</div>
-    <div class="mode-buttons">
-      <button class="mode-btn active" id="singleSideBtn">جهة واحدة</button>
-      <button class="mode-btn" id="doubleSideBtn">جهتين</button>
+<div class="launch-panel"> 
+    <div class="launch-title">إعدادات الانطلاق</div> 
+    <div class="mode-buttons"> 
+        <button class="mode-btn active" id="singleSideBtn">جهة واحدة</button> 
+        <button class="mode-btn" id="doubleSideBtn">جهتين</button> 
+    </div> 
+    <div class="group"> 
+        <label><span id="launchCountValue">1</span>عدد الكرات</label> 
+        <input id="launchCountInput" type="range" min="1" max="5" step="1" value="1"> 
+    </div> 
+    <div class="group"> 
+        <label><span id="launchAngleValue">45</span>زاوية الرفع</label> 
+        <input id="launchAngleInput" type="range" min="5" max="80" step="1" value="45"> 
+    </div> 
+    <div class="group"> 
+        <label>زاوية الانحراف نحو Z (بالدرجات):</label> 
+        <input type="range" id="launchAngleZInput" min="-90" max="90" value="0"> 
+        <span id="launchAngleZValue">0°</span> 
+    </div> 
+    
+    <div class="group" style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+        <input type="checkbox" id="enableZDrag" style="width: auto; cursor: pointer;">
+        <label for="enableZDrag" style="cursor: pointer; margin-bottom: 0;">تفعيل السحب على المحور Z</label>
     </div>
-    <div class="group">
-      <label><span id="launchCountValue">1</span>عدد الكرات</label>
-      <input id="launchCountInput" type="range" min="1" max="5" step="1" value="1">
-    </div>
-    <div class="group">
-      <label><span id="launchAngleValue">45</span>زاوية الرفع</label>
-      <input id="launchAngleInput" type="range" min="5" max="80" step="1" value="45">
-    </div>
-    <div class="group">
-      <label>زاوية الانحراف نحو Z (بالدرجات):</label>
-      <input type="range" id="launchAngleZInput" min="-90" max="90" value="0">
-      <span id="launchAngleZValue">0°</span>
-    </div>
-    <button class="launch-action" id="launchBtn">إطلاق الكرات </button>
-  </div>
+
+    <button class="launch-action" id="launchBtn">إطلق الكرات </button> 
+</div>
 
   <div class="panel">
     <h2>Newton Cradle Pro</h2>
